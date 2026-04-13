@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trò Chơi Ô Chữ: Thành Phần Của Nguyên Tử</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --apple-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+            --apple-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #020617; 
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- 16:9 PRESENTATION MODE LOCK --- */
+        .slide-wrapper {
+            width: 100vw;
+            height: 56.25vw;
+            max-width: 177.78vh;
+            max-height: 100vh;
+            margin: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #020617;
+        }
+
+        .cell-size {
+            width: clamp(2rem, 6.2vmin, 5rem);
+            height: clamp(2rem, 6.2vmin, 5rem);
+            flex-shrink: 0;
+        }
+        .cell-text { 
+            font-size: clamp(1.5rem, 4.2vmin, 3.5rem); 
+            font-weight: 800; 
+        }
+
+        .btn-size {
+            width: clamp(2.5rem, 6.2vmin, 5rem);
+            height: clamp(2.5rem, 6.2vmin, 5rem);
+            font-size: clamp(1.2rem, 3.5vmin, 2rem);
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+
+        .modal-cell-size {
+            width: clamp(3rem, 8vmin, 6rem);
+            height: clamp(3.5rem, 10vmin, 7.5rem);
+            font-size: clamp(2.5rem, 5.5vmin, 4.5rem);
+            flex-shrink: 0;
+        }
+
+        /* --- MESH GRADIENT BACKGROUND --- */
+        .ambient-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: -2;
+            background: #020617;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.4; 
+            animation: orbMove 30s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 70vw; height: 70vw; background: #1e3a8a; top: -30vh; left: -10vw; animation-delay: 0s; }
+        .orb-2 { width: 60vw; height: 60vw; background: #0f766e; bottom: -20vh; right: -10vw; animation-delay: -5s; }
+
+        @keyframes orbMove {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5vw, 5vh) scale(1.05); }
+            100% { transform: translate(-5vw, -5vh) scale(0.95); }
+        }
+
+        /* --- GIAO DIỆN KÍNH GÓC CẠNH --- */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        .glass-button {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .glass-button:hover:not(:disabled) {
+            background: #1e293b;
+            color: #f8fafc;
+            border-color: #475569;
+            transform: scale(1.05);
+        }
+        .glass-button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        .glass-button.solved {
+            background: #10b981; 
+            color: #ffffff;
+            border-color: #059669;
+            cursor: default;
+        }
+
+        /* --- FLIP CELLS --- */
+        .perspective { perspective: 1200px; }
+        .flip-inner {
+            position: relative;
+            width: 100%; height: 100%;
+            text-align: center;
+            transition: transform 0.6s var(--apple-spring); 
+            transform-style: preserve-3d;
+        }
+        .flip-cell.revealed .flip-inner { transform: rotateY(180deg); }
+        .flip-front, .flip-back {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 0.35rem; 
+        }
+        
+        .flip-front {
+            background: rgba(30, 41, 59, 0.8); 
+            border: 1px solid rgba(148, 163, 184, 0.2); 
+            transition: all 0.2s;
+        }
+        .flip-front.keyword-col {
+            background: rgba(202, 138, 4, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.5); 
+        }
+        
+        .flip-cell.clickable:hover .flip-front {
+            background: rgba(51, 65, 85, 1);
+            border-color: rgba(148, 163, 184, 0.5);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .flip-cell.clickable:hover .flip-front.keyword-col {
+            background: rgba(202, 138, 4, 0.2);
+            border-color: rgba(234, 179, 8, 0.8);
+        }
+
+        .flip-back {
+            transform: rotateY(180deg);
+            background: #ffffff; 
+            color: #0f172a; 
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .flip-back.keyword-col {
+            background: #eab308; 
+            color: #000000; 
+            border: 1px solid #ca8a04;
+        }
+        
+        .flip-back.keyword-finalized {
+            background: #fbbf24;
+            color: #000000; 
+            border: 2px solid #fef08a;
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.4);
+            transition: all 0.4s ease;
+            z-index: 5;
+        }
+
+        /* --- ANIMATIONS --- */
+        .morph-anim { animation: textMorphAnim 0.5s ease forwards; }
+        .pop-anim { animation: popAnim 0.3s ease forwards; }
+
+        @keyframes textMorphAnim {
+            0%   { transform: rotateY(180deg) scale(1); opacity: 1; }
+            40%  { transform: rotateY(180deg) scale(0.3) rotateX(90deg); opacity: 0; color: #fff; }
+            60%  { transform: rotateY(180deg) scale(1.3) rotateX(0deg); opacity: 1; color: #fff; }
+            100% { transform: rotateY(180deg) scale(1); opacity: 1; }
+        }
+        @keyframes popAnim {
+            0%   { transform: rotateY(180deg) scale(1); }
+            50%  { transform: rotateY(180deg) scale(1.1); }
+            100% { transform: rotateY(180deg) scale(1); }
+        }
+
+        /* --- MODAL CÂU HỎI --- */
+        #question-modal {
+            background: rgba(2, 6, 23, 0.85); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s;
+        }
+        #question-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: scale(0.98);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #0f172a; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        #question-modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        /* --- DECODING BOXES --- */
+        .type-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+        }
+        .type-box.filled {
+            background: #ffffff;
+            color: #0f172a; 
+            border-color: #ffffff;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+        }
+        .type-box.is-prefilled {
+            background: #eab308;
+            color: #000000; 
+            border-color: #ca8a04;
+            transform: scale(1.02);
+        }
+        
+        .type-box.decoding {
+            background: #064e3b; 
+            border-color: #34d399; 
+            color: #a7f3d0;
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.8);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) inset;
+        }
+
+        @keyframes shakeWrong {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake-error {
+            animation: shakeWrong 0.3s ease;
+        }
+        .shake-error .type-box.filled:not(.is-prefilled),
+        .shake-error .type-box:not(.is-prefilled) {
+            background: #ef4444; 
+            color: #ffffff;
+            border-color: #dc2626;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .timer-mini {
+            transition: color 0.3s ease;
+            font-variant-numeric: tabular-nums;
+        }
+        .timer-warning {
+            color: #ef4444 !important;
+            transform: scale(1.1);
+        }
+
+        .grand-win-glow {
+            box-shadow: 0 0 80px rgba(250, 204, 21, 0.3), inset 0 0 30px rgba(250, 204, 21, 0.1) !important;
+            border-color: rgba(250, 204, 21, 0.5) !important;
+            transition: all 1.5s ease;
+        }
+    </style>
+</head>
+<body class="selection:bg-white/20 bg-black">
+
+    <div class="slide-wrapper z-10">
+        
+        <div class="ambient-bg">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+        </div>
+
+        <header class="w-full text-center py-[4vh] relative z-10 pointer-events-none">
+            <h1 class="text-[clamp(2.5rem,6vh,4.5rem)] font-black tracking-[0.2em] text-white uppercase opacity-90">
+                Trò Chơi Ô Chữ
+            </h1>
+        </header>
+
+        <main class="flex-1 flex px-[4vh] pb-[4vh] items-center justify-center relative z-10">
+            <div class="w-full h-full flex flex-col gap-[1vh] items-center justify-center glass-panel p-[4vh] rounded-[2rem]" id="crossword-container">
+                <!-- Grid ô chữ sẽ được tạo bằng JavaScript -->
+            </div>
+        </main>
+
+        <div id="question-modal" class="absolute inset-0 z-50 flex flex-col items-center justify-center p-[4vh]">
+            <div class="modal-content rounded-[2rem] p-[5vh] w-full max-w-[140vh] flex flex-col items-center text-center">
+                
+                <div class="mb-[3vh] flex items-center justify-center gap-4 w-full opacity-80">
+                    <span class="text-[clamp(1rem,2.5vh,1.5rem)] font-bold tracking-[0.15em] text-sky-400 uppercase" id="q-title">Hàng ngang số X</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                    <span class="text-[clamp(1rem,2vh,1.25rem)] font-semibold tracking-wider bg-slate-800 border border-slate-700 px-4 py-1.5 rounded text-slate-300" id="q-length">X CHỮ CÁI</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                    <span class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-mono timer-mini text-slate-200 font-bold" id="timer">15s</span>
+                </div>
+                
+                <p class="text-[clamp(2.2rem,5.5vh,4rem)] font-bold leading-snug text-white my-[3vh] w-full" id="q-text">
+                    Nội dung câu hỏi sẽ hiển thị ở đây...
+                </p>
+
+                <div id="attempts-container" class="mb-[2vh] text-[clamp(1.2rem,2.5vh,1.8rem)] font-semibold text-rose-500 hidden transition-opacity">
+                    SỐ LẦN ĐOÁN CÒN LẠI: <span id="attempts-left" class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-black text-rose-400">2</span>
+                </div>
+
+                <div id="type-area" class="mt-[2vh] mb-[2vh]">
+                    <div id="input-boxes" class="flex gap-[1vh] flex-wrap justify-center">
+                        <!-- Boxes render here -->
+                    </div>
+                </div>
+
+                <button onclick="closePanel()" class="mt-[3vh] text-[clamp(1rem,2vh,1.5rem)] text-slate-500 hover:text-slate-300 transition-colors">
+                    [Nhấn ESC để đóng]
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // === HỆ THỐNG ÂM THANH (CẬP NHẬT GẮN FILE MP3 CỦA NGƯỜI DÙNG) ===
+        const sound = {
+            ctx: null,
+            decodeTimer: null,
+            // Load các tệp MP3 do giáo viên cung cấp
+            sfx: {
+                correct: new Audio('correct.mp3'),
+                wrong: new Audio('wrong-answer-sound-effect.mp3'),
+                ding: new Audio('ding-sound-effect_2.mp3'),
+                wrongAlt: new Audio('wrong_5.mp3')
+            },
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+            },
+            // Giữ lại âm thanh điện tử cho các hiệu ứng giao diện (tick, mở bảng, decode)
+            playTone(freq, type = 'sine', duration = 0.1, vol = 0.8, slideFreq = null) {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                if (slideFreq) {
+                    osc.frequency.exponentialRampToValueAtTime(slideFreq, this.ctx.currentTime + duration);
+                }
+                
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            },
+
+            playOpen() { this.playTone(600, 'sine', 0.15, 1.0, 100); },
+            playTick() { this.playTone(1500, 'triangle', 0.05, 0.4); },
+
+            playWrong() { 
+                this.sfx.wrong.currentTime = 0;
+                let promise = this.sfx.wrong.play();
+                if (promise !== undefined) {
+                    promise.catch(e => {
+                        // Kế hoạch dự phòng: Nếu không tải MP3 lên hoặc lỗi, phát âm thanh điện tử
+                        this.playTone(150, 'sawtooth', 0.3, 1.0); 
+                        setTimeout(() => this.playTone(130, 'sawtooth', 0.4, 1.0), 150);
+                    });
+                }
+            },
+
+            playCorrect() {
+                this.sfx.correct.currentTime = 0;
+                let promise = this.sfx.correct.play();
+                if (promise !== undefined) {
+                    promise.catch(e => {
+                        // Kế hoạch dự phòng
+                        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+                        notes.forEach((freq, i) => {
+                            setTimeout(() => {
+                                this.playTone(freq, 'sine', 0.3, 0.6);
+                                this.playTone(freq * 1.5, 'triangle', 0.15, 0.2); 
+                            }, i * 35); 
+                        });
+                    });
+                }
+            },
+
+            playWin() {
+                this.sfx.ding.currentTime = 0;
+                let promise = this.sfx.ding.play();
+                if (promise !== undefined) {
+                    promise.catch(e => {
+                        // Kế hoạch dự phòng
+                        [261.63, 311.13, 392.00].forEach(freq => this.playTone(freq, 'square', 1.0, 0.5)); 
+                        this.playTone(130.81, 'sawtooth', 1.5, 1.0); 
+                        setTimeout(() => {
+                            [261.63, 311.13, 392.00].forEach(freq => this.playTone(freq * 2, 'square', 1.5, 0.6));
+                        }, 400);
+                    });
+                }
+            },
+
+            playGrandWin() {
+                // Nhạc kèn chiến thắng MLG kinh điển khi kết thúc toàn bộ
+                const horn = (delay) => {
+                    setTimeout(() => {
+                        this.playTone(300, 'sawtooth', 0.3, 0.8);
+                        this.playTone(310, 'square', 0.3, 0.8);
+                        this.playTone(320, 'sawtooth', 0.3, 0.8);
+                    }, delay);
+                };
+                horn(0); horn(150); horn(300); 
+                setTimeout(() => {
+                    this.playTone(300, 'sawtooth', 1.5, 0.8);
+                    this.playTone(310, 'square', 1.5, 0.8, 450); 
+                    this.playTone(320, 'sawtooth', 1.5, 0.8);
+                }, 500);
+            },
+
+            startDecode() {
+                if(!this.ctx) return;
+                this.decodeTimer = setInterval(() => {
+                    this.playTone(Math.random() * 800 + 400, 'square', 0.03, 0.15);
+                    this.playTone(Math.random() * 1000 + 800, 'sine', 0.02, 0.1);
+                }, 30);
+            },
+            stopDecode() {
+                clearInterval(this.decodeTimer);
+            }
+        };
+
+        document.body.addEventListener('click', () => sound.init(), { once: true });
+        document.body.addEventListener('keydown', () => sound.init(), { once: true });
+
+        const puzzleData = [
+            { id: 1, word: "HẠTNHÂN", clue: "Trung tâm của nguyên tử, chứa proton và neutron", keyIndex: 3 },
+            { id: 2, word: "VÀNG", clue: "Kim loại Rutherford dùng trong thí nghiệm bắn phá", keyIndex: 3 },
+            { id: 3, word: "AMU", clue: "Đơn vị khối lượng nguyên tử (viết tắt)", keyIndex: 2 },
+            { id: 4, word: "HYLẠP", clue: "Nơi Democritus đề xuất khái niệm 'atomos'", keyIndex: 1 },
+            { id: 5, word: "ĐIỆNTÍCH", clue: "Thuộc tính của proton (+) và electron (-)", keyIndex: 2 },
+            { id: 6, word: "THOMSON", clue: "Nhà bác học người Anh phát hiện ra electron (1897)", keyIndex: 6 },
+            { id: 7, word: "PROTON", clue: "Hạt mang điện dương trong hạt nhân", keyIndex: 3 },
+            { id: 8, word: "KÍCHTHƯỚC", clue: "Đặc điểm của nguyên tử, đo bằng pm hoặc Å", keyIndex: 6 } 
+        ];
+
+        const KEYWORD_COLUMN_INDEX = 6; 
+        const TOTAL_COLUMNS = 12;
+        const CORRECT_VERTICAL_KEYWORD = ['N', 'G', 'U', 'Y', 'Ê', 'N', 'T', 'Ử'];
+
+        let revealedRows = new Set();
+        let keywordRevealed = false;
+        let activeRowId = null;
+        let activeWordTarget = "";
+        let timerInterval;            
+        let timeLeft = 15;
+        let attemptsLeft = 2;
+        let isDecoding = false;
+
+        function renderGrid() {
+            const container = document.getElementById('crossword-container');
+            container.innerHTML = '';
+
+            puzzleData.forEach(row => {
+                const startCol = KEYWORD_COLUMN_INDEX - row.keyIndex;
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex items-center gap-[2vh] w-full justify-center';
+
+                const isRowRevealed = revealedRows.has(row.id);
+                const btn = document.createElement('button');
+                
+                btn.className = `glass-button btn-size rounded-full font-bold flex-shrink-0 flex items-center justify-center z-10 ${
+                    isRowRevealed ? 'solved' : ''
+                }`;
+                btn.innerText = row.id;
+                
+                if (!isRowRevealed) {
+                    btn.onclick = () => openQuestion(row.id);
+                } else {
+                    btn.disabled = true;
+                }
+                rowDiv.appendChild(btn);
+
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'flex gap-[3px] perspective';
+
+                for (let i = 0; i < TOTAL_COLUMNS; i++) {
+                    const cellContainer = document.createElement('div');
+                    const charIndex = i - startCol;
+                    const isLetterCell = charIndex >= 0 && charIndex < row.word.length;
+                    const isKeywordCol = i === KEYWORD_COLUMN_INDEX;
+
+                    if (isLetterCell) {
+                        const letter = row.word[charIndex];
+                        const isCellRevealed = isRowRevealed || (isKeywordCol && keywordRevealed);
+                        
+                        cellContainer.id = `cell-container-${row.id}-${i}`;
+                        cellContainer.className = `flip-cell cell-size ${isCellRevealed ? 'revealed' : ''}`;
+                        
+                        const delay = isRowRevealed && !keywordRevealed ? charIndex * 0.05 : 0;
+                        let displayLetter = letter;
+                        if (isKeywordCol && keywordRevealed) {
+                            displayLetter = CORRECT_VERTICAL_KEYWORD[row.id - 1];
+                        }
+
+                        cellContainer.innerHTML = `
+                            <div class="flip-inner" id="flip-inner-${row.id}-${i}" style="transition-delay: ${delay}s">
+                                <div class="flip-front ${isKeywordCol ? 'keyword-col' : ''}"></div>
+                                <div class="flip-back cell-text ${isKeywordCol ? 'keyword-col' : ''} ${isKeywordCol && keywordRevealed ? 'keyword-finalized' : ''}" id="flip-back-${row.id}-${i}">
+                                    ${displayLetter}
+                                </div>
+                            </div>
+                        `;
+
+                        if (isKeywordCol && !keywordRevealed) {
+                            cellContainer.classList.add('clickable');
+                            cellContainer.onclick = () => { sound.init(); revealVerticalKeyword(); };
+                            cellContainer.title = "Mở từ khóa NGUYÊN TỬ";
+                        } else if (!isRowRevealed && !isKeywordCol) {
+                            cellContainer.classList.add('clickable');
+                            cellContainer.onclick = () => openQuestion(row.id);
+                            cellContainer.title = "Nhấn để xem câu hỏi";
+                        }
+
+                    } else {
+                        cellContainer.className = 'cell-size bg-transparent';
+                    }
+                    gridDiv.appendChild(cellContainer);
+                }
+
+                rowDiv.appendChild(gridDiv);
+                container.appendChild(rowDiv);
+            });
+        }
+
+        function openQuestion(id) {
+            if (revealedRows.has(id)) return;
+            if (isDecoding) return;
+
+            sound.init();
+            sound.playOpen();
+            
+            const rowData = puzzleData.find(r => r.id === id);
+            activeRowId = id;
+            activeWordTarget = rowData.word;
+            attemptsLeft = 2;
+            isDecoding = false;
+
+            const typeArea = document.getElementById('type-area');
+            if(typeArea) typeArea.classList.remove('shake-error');
+
+            const attemptsContainer = document.getElementById('attempts-container');
+            if(attemptsContainer) attemptsContainer.classList.add('hidden'); 
+
+            const modal = document.getElementById('question-modal');
+            modal.classList.add('active');
+
+            document.getElementById('q-title').innerText = `HÀNG NGANG SỐ ${id}`;
+            document.getElementById('q-length').innerText = `${rowData.word.length} CHỮ CÁI`;
+            document.getElementById('q-text').innerText = rowData.clue;
+
+            const boxesContainer = document.getElementById('input-boxes');
+            boxesContainer.innerHTML = '';
+            for(let i = 0; i < activeWordTarget.length; i++) {
+                const isKeyCell = (i === rowData.keyIndex) && keywordRevealed;
+                if (isKeyCell) {
+                    const knownLetter = activeWordTarget[i];
+                    boxesContainer.innerHTML += `<div class="type-box is-prefilled modal-cell-size flex items-center justify-center font-black uppercase">${knownLetter}</div>`;
+                } else {
+                    boxesContainer.innerHTML += `<div class="type-box modal-cell-size flex items-center justify-center font-black uppercase empty-box"></div>`;
+                }
+            }
+
+            startTimer();
+        }
+
+        // --- BỘ LẮNG NGHE PHÍM TẮT Y / N ---
+        document.body.addEventListener('keydown', (e) => {
+            if (activeRowId === null) return;
+            if (isDecoding) return;
+
+            const key = e.key.toLowerCase();
+            
+            if (key === 'y') {
+                sound.init();
+                runDecodingAnimation(); 
+            } else if (key === 'n') {
+                sound.init();
+                submitWrong(); 
+            } else if (e.key === 'Escape') {
+                closePanel();
+            }
+        });
+
+        // --- KĨ XẢO DECODING ---
+        function runDecodingAnimation() {
+            isDecoding = true;
+            clearInterval(timerInterval);
+            sound.startDecode();
+
+            const boxes = document.querySelectorAll('#input-boxes > .empty-box');
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0101";
+            const rowData = puzzleData.find(r => r.id === activeRowId);
+
+            let targetChars = [];
+            for (let i = 0; i < activeWordTarget.length; i++) {
+                const isKeyCell = (i === rowData.keyIndex) && keywordRevealed;
+                if (!isKeyCell) {
+                    targetChars.push(activeWordTarget[i]);
+                }
+            }
+
+            boxes.forEach((box, index) => {
+                box.classList.add('decoding');
+                
+                let interval = setInterval(() => {
+                    box.innerText = chars[Math.floor(Math.random() * chars.length)];
+                }, 50);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    box.classList.remove('decoding');
+                    box.classList.add('filled');
+                    box.innerText = targetChars[index]; 
+                }, 300 + (index * 120)); 
+            });
+
+            const totalAnimationTime = 300 + ((boxes.length - 1) * 120);
+            
+            setTimeout(() => {
+                sound.stopDecode();
+                submitCorrect();
+            }, totalAnimationTime + 200);
+        }
+
+        function submitCorrect() {
+            sound.playCorrect();
+            revealedRows.add(activeRowId);
+            closePanel();
+            renderGrid();
+            
+            if(revealedRows.size === puzzleData.length) {
+                if (!keywordRevealed) {
+                    setTimeout(() => revealVerticalKeyword(), 1000); 
+                    setTimeout(() => triggerGrandWin(), 2500);
+                } else {
+                    setTimeout(() => triggerGrandWin(), 800);
+                }
+            }
+        }
+
+        // --- XỬ LÝ SAI ---
+        function submitWrong() {
+            attemptsLeft--;
+            sound.playWrong();
+            
+            const typeArea = document.getElementById('type-area');
+            typeArea.classList.remove('shake-error');
+            void typeArea.offsetWidth; 
+            typeArea.classList.add('shake-error');
+
+            const attemptsContainer = document.getElementById('attempts-container');
+            attemptsContainer.classList.remove('hidden');
+            document.getElementById('attempts-left').innerText = attemptsLeft;
+            
+            setTimeout(() => {
+                typeArea.classList.remove('shake-error'); 
+                if (attemptsLeft <= 0) closePanel(); 
+            }, 600); 
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 15;
+            
+            const timerEl = document.getElementById('timer');
+            timerEl.innerText = timeLeft + 's';
+            timerEl.classList.remove('timer-warning');
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = timeLeft + 's';
+                
+                if (timeLeft <= 5 && timeLeft > 0) {
+                    timerEl.classList.add('timer-warning');
+                    sound.playTick(); 
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerEl.innerText = "0s";
+                }
+            }, 1000);
+        }
+
+        function closePanel() {
+            clearInterval(timerInterval);
+            activeRowId = null;
+            isDecoding = false; 
+            document.getElementById('question-modal').classList.remove('active');
+        }
+
+        function revealVerticalKeyword() {
+            if(keywordRevealed) return;
+            keywordRevealed = true;
+            sound.playWin();
+
+            puzzleData.forEach((row, index) => {
+                const targetLetter = CORRECT_VERTICAL_KEYWORD[index];
+                const colIndex = KEYWORD_COLUMN_INDEX;
+
+                const cellContainer = document.getElementById(`cell-container-${row.id}-${colIndex}`);
+                const flipBack = document.getElementById(`flip-back-${row.id}-${colIndex}`);
+
+                if (cellContainer && flipBack) {
+                    const delay = index * 120; 
+
+                    setTimeout(() => {
+                        if (revealedRows.has(row.id)) {
+                            if (flipBack.innerText.trim() !== targetLetter) {
+                                flipBack.classList.add('morph-anim');
+                                setTimeout(() => { flipBack.innerText = targetLetter; }, 250); 
+                            } else {
+                                flipBack.classList.add('pop-anim');
+                            }
+                        } else {
+                            flipBack.innerText = targetLetter;
+                            cellContainer.classList.add('revealed');
+                        }
+                        flipBack.classList.add('keyword-finalized');
+                    }, delay);
+                }
+            });
+        }
+
+        function triggerGrandWin() {
+            sound.playGrandWin();
+            const container = document.getElementById('crossword-container');
+            container.classList.add('grand-win-glow');
+        }
+
+        renderGrid();
+    </script>
+</body>
+</html>
