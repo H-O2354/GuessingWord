@@ -422,20 +422,15 @@
             },
 
             playGrandWin() {
-                // Nhạc kèn chiến thắng MLG kinh điển khi kết thúc toàn bộ
-                const horn = (delay) => {
-                    setTimeout(() => {
-                        this.playTone(300, 'sawtooth', 0.3, 0.8);
-                        this.playTone(310, 'square', 0.3, 0.8);
-                        this.playTone(320, 'sawtooth', 0.3, 0.8);
-                    }, delay);
-                };
-                horn(0); horn(150); horn(300); 
-                setTimeout(() => {
-                    this.playTone(300, 'sawtooth', 1.5, 0.8);
-                    this.playTone(310, 'square', 1.5, 0.8, 450); 
-                    this.playTone(320, 'sawtooth', 1.5, 0.8);
-                }, 500);
+                // Chỉ phát một tiếng ding duy nhất khi hoàn thành toàn bộ game thay vì đoạn nhạc dài
+                this.sfx.ding.currentTime = 0;
+                let promise = this.sfx.ding.play();
+                if (promise !== undefined) {
+                    promise.catch(e => {
+                        // Kế hoạch dự phòng: 1 tiếng ding điện tử đơn giản, thanh tao
+                        this.playTone(1046.50, 'sine', 0.5, 0.6); 
+                    });
+                }
             },
 
             startDecode() {
