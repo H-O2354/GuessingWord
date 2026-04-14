@@ -15,11 +15,20 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #020617; 
+            /* Đổi nền đen thành dải Gradient Xanh Hoàng Gia sang trọng, nịnh mắt */
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a); 
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
             color: #ffffff;
             -webkit-font-smoothing: antialiased;
             margin: 0;
             padding: 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* --- 16:9 PRESENTATION MODE LOCK --- */
@@ -33,7 +42,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: #020617;
         }
 
         .cell-size {
@@ -43,7 +51,7 @@
         }
         .cell-text { 
             font-size: clamp(1.5rem, 4.2vmin, 3.5rem); 
-            font-weight: 800; 
+            font-weight: 900; 
         }
 
         .btn-size {
@@ -51,7 +59,7 @@
             height: clamp(2.5rem, 6.2vmin, 5rem);
             font-size: clamp(1.2rem, 3.5vmin, 2rem);
             flex-shrink: 0;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .modal-cell-size {
@@ -67,57 +75,60 @@
             top: 0; left: 0; width: 100%; height: 100%;
             overflow: hidden;
             z-index: -2;
-            background: #020617;
         }
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(140px);
-            opacity: 0.4; 
-            animation: orbMove 30s infinite alternate ease-in-out;
+            filter: blur(120px);
+            opacity: 0.6; 
+            animation: orbMove 20s infinite alternate ease-in-out;
         }
-        .orb-1 { width: 70vw; height: 70vw; background: #1e3a8a; top: -30vh; left: -10vw; animation-delay: 0s; }
-        .orb-2 { width: 60vw; height: 60vw; background: #0f766e; bottom: -20vh; right: -10vw; animation-delay: -5s; }
+        /* Orbs đổi sang màu Cyan sáng và Tím rực rỡ */
+        .orb-1 { width: 70vw; height: 70vw; background: #0284c7; top: -30vh; left: -10vw; animation-delay: 0s; }
+        .orb-2 { width: 60vw; height: 60vw; background: #7c3aed; bottom: -20vh; right: -10vw; animation-delay: -5s; }
 
         @keyframes orbMove {
             0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(5vw, 5vh) scale(1.05); }
-            100% { transform: translate(-5vw, -5vh) scale(0.95); }
+            50% { transform: translate(5vw, 5vh) scale(1.1); }
+            100% { transform: translate(-5vw, -5vh) scale(0.9); }
         }
 
-        /* --- GIAO DIỆN KÍNH GÓC CẠNH --- */
+        /* --- GIAO DIỆN KÍNH (SÁNG VÀ NỔI BẬT HƠN) --- */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
         }
 
+        /* Nút bấm câu hỏi */
         .glass-button {
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            transition: all 0.2s ease;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            border: 2px solid #7dd3fc;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s var(--apple-ease);
             cursor: pointer;
         }
         .glass-button:hover:not(:disabled) {
-            background: #1e293b;
-            color: #f8fafc;
-            border-color: #475569;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #38bdf8, #3b82f6);
+            border-color: #bae6fd;
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
         }
         .glass-button:active:not(:disabled) {
-            transform: scale(0.98);
+            transform: scale(0.95);
         }
         .glass-button.solved {
-            background: #10b981; 
+            background: linear-gradient(135deg, #10b981, #059669); 
             color: #ffffff;
-            border-color: #059669;
+            border-color: #34d399;
+            box-shadow: none;
             cursor: default;
         }
 
-        /* --- FLIP CELLS --- */
+        /* --- FLIP CELLS (DỄ ĐẾM, ĐẬM ĐÀ, NỊNH MẮT) --- */
         .perspective { perspective: 1200px; }
         .flip-inner {
             position: relative;
@@ -132,49 +143,58 @@
             width: 100%; height: 100%;
             backface-visibility: hidden;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 0.35rem; 
+            border-radius: 0.5rem; 
         }
         
+        /* Ô trống: Viền trắng nét căng, kính mờ sáng */
         .flip-front {
-            background: rgba(30, 41, 59, 0.8); 
-            border: 1px solid rgba(148, 163, 184, 0.2); 
+            background: rgba(255, 255, 255, 0.2); 
+            border: 3px solid rgba(255, 255, 255, 0.7); 
+            box-shadow: inset 0 0 15px rgba(255,255,255,0.15);
             transition: all 0.2s;
         }
         .flip-front.keyword-col {
-            background: rgba(202, 138, 4, 0.1);
-            border: 1px solid rgba(234, 179, 8, 0.5); 
+            background: rgba(250, 204, 21, 0.3);
+            border: 3px solid #fde047; 
+            box-shadow: inset 0 0 20px rgba(250, 204, 21, 0.3);
         }
         
         .flip-cell.clickable:hover .flip-front {
-            background: rgba(51, 65, 85, 1);
-            border-color: rgba(148, 163, 184, 0.5);
-            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.4);
+            border-color: #ffffff;
+            transform: scale(1.08);
             z-index: 10;
+            box-shadow: 0 0 20px rgba(255,255,255,0.4);
         }
         .flip-cell.clickable:hover .flip-front.keyword-col {
-            background: rgba(202, 138, 4, 0.2);
-            border-color: rgba(234, 179, 8, 0.8);
+            background: rgba(250, 204, 21, 0.5);
+            border-color: #fef08a;
+            transform: scale(1.08);
+            z-index: 10;
+            box-shadow: 0 0 25px rgba(250, 204, 21, 0.6);
         }
 
+        /* Ô đã lật: Nền trắng tinh khôi, chữ Xanh biển đậm */
         .flip-back {
             transform: rotateY(180deg);
             background: #ffffff; 
-            color: #0f172a; 
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            color: #1e3a8a; 
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
 
+        /* Ô cột dọc: Nền vàng rực, chữ đỏ thẫm */
         .flip-back.keyword-col {
-            background: #eab308; 
-            color: #000000; 
-            border: 1px solid #ca8a04;
+            background: #facc15; 
+            color: #7f1d1d; 
+            border: 3px solid #facc15;
         }
         
         .flip-back.keyword-finalized {
-            background: #fbbf24;
-            color: #000000; 
-            border: 2px solid #fef08a;
-            box-shadow: 0 0 30px rgba(250, 204, 21, 0.4);
+            background: linear-gradient(135deg, #fde047, #f59e0b);
+            color: #7f1d1d; 
+            border: 4px solid #fef08a;
+            box-shadow: 0 0 40px rgba(250, 204, 21, 0.6), inset 0 2px 10px rgba(255,255,255,0.6);
             transition: all 0.4s ease;
             z-index: 5;
         }
@@ -191,15 +211,15 @@
         }
         @keyframes popAnim {
             0%   { transform: rotateY(180deg) scale(1); }
-            50%  { transform: rotateY(180deg) scale(1.1); }
+            50%  { transform: rotateY(180deg) scale(1.15); }
             100% { transform: rotateY(180deg) scale(1); }
         }
 
         /* --- MODAL CÂU HỎI --- */
         #question-modal {
-            background: rgba(2, 6, 23, 0.85); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s;
@@ -211,9 +231,9 @@
         .modal-content {
             transform: scale(0.98);
             transition: transform 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: #0f172a; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); 
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.1);
         }
         #question-modal.active .modal-content {
             transform: scale(1);
@@ -221,37 +241,38 @@
 
         /* --- DECODING BOXES --- */
         .type-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.5);
             transition: all 0.2s ease;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
         }
         .type-box.filled {
             background: #ffffff;
-            color: #0f172a; 
+            color: #1e3a8a; 
             border-color: #ffffff;
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
         .type-box.is-prefilled {
-            background: #eab308;
-            color: #000000; 
-            border-color: #ca8a04;
-            transform: scale(1.02);
+            background: linear-gradient(135deg, #fde047, #f59e0b);
+            color: #7f1d1d; 
+            border-color: #fef08a;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
         }
         
         .type-box.decoding {
-            background: #064e3b; 
-            border-color: #34d399; 
-            color: #a7f3d0;
-            text-shadow: 0 0 10px rgba(52, 211, 153, 0.8);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) inset;
+            background: #0ea5e9; 
+            border-color: #7dd3fc; 
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255,255,255,0.9);
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.6) inset;
         }
 
         @keyframes shakeWrong {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
         }
         .shake-error {
             animation: shakeWrong 0.3s ease;
@@ -260,8 +281,8 @@
         .shake-error .type-box:not(.is-prefilled) {
             background: #ef4444; 
             color: #ffffff;
-            border-color: #dc2626;
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            border-color: #fca5a5;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
         }
 
         .timer-mini {
@@ -269,18 +290,18 @@
             font-variant-numeric: tabular-nums;
         }
         .timer-warning {
-            color: #ef4444 !important;
-            transform: scale(1.1);
+            color: #fca5a5 !important;
+            transform: scale(1.15);
         }
 
         .grand-win-glow {
-            box-shadow: 0 0 80px rgba(250, 204, 21, 0.3), inset 0 0 30px rgba(250, 204, 21, 0.1) !important;
-            border-color: rgba(250, 204, 21, 0.5) !important;
+            box-shadow: 0 0 100px rgba(250, 204, 21, 0.5), inset 0 0 40px rgba(250, 204, 21, 0.2) !important;
+            border-color: rgba(250, 204, 21, 0.8) !important;
             transition: all 1.5s ease;
         }
     </style>
 </head>
-<body class="selection:bg-white/20 bg-black">
+<body class="selection:bg-white/30">
 
     <div class="slide-wrapper z-10">
         
@@ -290,7 +311,7 @@
         </div>
 
         <header class="w-full text-center py-[4vh] relative z-10 pointer-events-none">
-            <h1 class="text-[clamp(2.5rem,6vh,4.5rem)] font-black tracking-[0.2em] text-white uppercase opacity-90">
+            <h1 class="text-[clamp(2.5rem,6vh,4.5rem)] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-white to-emerald-200 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] uppercase">
                 Trò Chơi Ô Chữ
             </h1>
         </header>
@@ -304,20 +325,20 @@
         <div id="question-modal" class="absolute inset-0 z-50 flex flex-col items-center justify-center p-[4vh]">
             <div class="modal-content rounded-[2rem] p-[5vh] w-full max-w-[140vh] flex flex-col items-center text-center">
                 
-                <div class="mb-[3vh] flex items-center justify-center gap-4 w-full opacity-80">
-                    <span class="text-[clamp(1rem,2.5vh,1.5rem)] font-bold tracking-[0.15em] text-sky-400 uppercase" id="q-title">Hàng ngang số X</span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                    <span class="text-[clamp(1rem,2vh,1.25rem)] font-semibold tracking-wider bg-slate-800 border border-slate-700 px-4 py-1.5 rounded text-slate-300" id="q-length">X CHỮ CÁI</span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                    <span class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-mono timer-mini text-slate-200 font-bold" id="timer">15s</span>
+                <div class="mb-[3vh] flex items-center justify-center gap-4 w-full opacity-90">
+                    <span class="text-[clamp(1rem,2.5vh,1.5rem)] font-bold tracking-[0.15em] text-cyan-300 uppercase drop-shadow-md" id="q-title">Hàng ngang số X</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/50"></span>
+                    <span class="text-[clamp(1rem,2vh,1.25rem)] font-bold tracking-wider bg-white/20 border border-white/30 px-4 py-1.5 rounded-lg text-white shadow-inner" id="q-length">X CHỮ CÁI</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/50"></span>
+                    <span class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-mono timer-mini text-emerald-300 font-black drop-shadow-md" id="timer">15s</span>
                 </div>
                 
-                <p class="text-[clamp(2.2rem,5.5vh,4rem)] font-bold leading-snug text-white my-[3vh] w-full" id="q-text">
+                <p class="text-[clamp(2.2rem,5.5vh,4rem)] font-black leading-snug text-white my-[3vh] w-full drop-shadow-lg" id="q-text">
                     Nội dung câu hỏi sẽ hiển thị ở đây...
                 </p>
 
-                <div id="attempts-container" class="mb-[2vh] text-[clamp(1.2rem,2.5vh,1.8rem)] font-semibold text-rose-500 hidden transition-opacity">
-                    SỐ LẦN ĐOÁN CÒN LẠI: <span id="attempts-left" class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-black text-rose-400">2</span>
+                <div id="attempts-container" class="mb-[2vh] text-[clamp(1.2rem,2.5vh,1.8rem)] font-bold text-rose-300 hidden transition-opacity">
+                    SỐ LẦN ĐOÁN CÒN LẠI: <span id="attempts-left" class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-black text-white bg-rose-600 px-4 py-1 rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.8)] border border-rose-400">2</span>
                 </div>
 
                 <div id="type-area" class="mt-[2vh] mb-[2vh]">
@@ -326,7 +347,7 @@
                     </div>
                 </div>
 
-                <button onclick="closePanel()" class="mt-[3vh] text-[clamp(1rem,2vh,1.5rem)] text-slate-500 hover:text-slate-300 transition-colors">
+                <button onclick="closePanel()" class="mt-[3vh] text-[clamp(1rem,2vh,1.5rem)] text-white/50 hover:text-white transition-colors font-medium">
                     [Nhấn ESC để đóng]
                 </button>
             </div>
