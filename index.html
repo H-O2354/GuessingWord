@@ -339,11 +339,11 @@
                     Nội dung câu hỏi...
                 </p>
 
-                <!-- === KHUNG GỢI Ý (Sẽ hiện ra khi trả lời sai lần 1) === -->
+                <!-- === KHUNG GỢI Ý === -->
                 <div id="hint-container" class="hidden flex-col items-center justify-center w-full max-w-[90vh] mb-[2vh]">
                     <div class="flex items-center gap-2 mb-[1.5vh] opacity-90">
                         <span class="text-amber-400 text-[clamp(1.5rem,3vh,2rem)]">💡</span>
-                        <span class="text-amber-400 font-black text-[clamp(1.2rem,2.5vh,1.8rem)] uppercase tracking-[0.2em] drop-shadow-md">Gợi Ý:</span>
+                        <span id="hint-title" class="text-amber-400 font-black text-[clamp(1.2rem,2.5vh,1.8rem)] uppercase tracking-[0.2em] drop-shadow-md">Gợi Ý</span>
                     </div>
                     <!-- Ảnh gợi ý -->
                     <img id="hint-image" src="" alt="Gợi ý" class="hidden max-h-[22vh] object-contain rounded-xl border-2 border-white/20 shadow-[0_5px_20px_rgba(0,0,0,0.5)]">
@@ -596,11 +596,29 @@
             const attemptsContainer = document.getElementById('attempts-container');
             if(attemptsContainer) attemptsContainer.classList.add('hidden'); 
 
-            // Ẩn Hint Container mỗi khi mở câu hỏi mới
+            // Cấu hình khung hiển thị Hình ảnh / Gợi ý
             const hintContainer = document.getElementById('hint-container');
-            hintContainer.classList.add('hidden');
+            const hintImage = document.getElementById('hint-image');
+            const hintText = document.getElementById('hint-text');
+            const hintTitle = document.getElementById('hint-title');
+            
             hintContainer.classList.remove('hint-animate');
-            hintContainer.classList.remove('flex'); // Tránh flex làm lộ padding
+
+            // Nếu câu có hình, show hình ngay lập tức. Nếu là text (câu 3, 5), giấu đi chờ sai mới mở.
+            if (rowData.hintType === 'image') {
+                hintContainer.classList.remove('hidden');
+                hintContainer.classList.add('flex');
+                hintImage.src = rowData.hintContent;
+                hintImage.classList.remove('hidden');
+                hintText.classList.add('hidden');
+                hintTitle.innerText = "HÌNH ẢNH MINH HỌA";
+            } else {
+                hintContainer.classList.add('hidden');
+                hintContainer.classList.remove('flex');
+                hintImage.classList.add('hidden');
+                hintText.classList.add('hidden');
+                hintTitle.innerText = "GỢI Ý BỔ SUNG";
+            }
 
             const modal = document.getElementById('question-modal');
             modal.classList.add('active');
@@ -645,26 +663,19 @@
         // --- HIỂN THỊ GỢI Ý ---
         function showHint() {
             const rowData = puzzleData.find(r => r.id === activeRowId);
-            if (!rowData) return;
+            
+            // Nếu câu này là hình ảnh thì đã hiện sẵn rồi, bỏ qua không làm gì cả
+            if (!rowData || rowData.hintType !== 'text') return;
 
             const hintContainer = document.getElementById('hint-container');
-            const hintImage = document.getElementById('hint-image');
             const hintText = document.getElementById('hint-text');
 
-            // Xóa class hidden, thêm class flex và class hiệu ứng fade in
+            // Xóa class hidden, thêm class flex và class hiệu ứng fade in (chỉ kích hoạt cho câu 3, 5)
             hintContainer.classList.remove('hidden');
             hintContainer.classList.add('flex', 'hint-animate');
 
-            // Xử lý dữ liệu Hint
-            if (rowData.hintType === 'image') {
-                hintImage.src = rowData.hintContent;
-                hintImage.classList.remove('hidden');
-                hintText.classList.add('hidden');
-            } else if (rowData.hintType === 'text') {
-                hintText.innerText = rowData.hintContent;
-                hintText.classList.remove('hidden');
-                hintImage.classList.add('hidden');
-            }
+            hintText.innerText = rowData.hintContent;
+            hintText.classList.remove('hidden');
         }
 
         // --- KĨ XẢO DECODING ---
