@@ -15,7 +15,6 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            /* Đổi nền đen thành dải Gradient Xanh Hoàng Gia sang trọng, nịnh mắt */
             background: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a); 
             background-size: 200% 200%;
             animation: gradientShift 15s ease infinite;
@@ -83,7 +82,6 @@
             opacity: 0.6; 
             animation: orbMove 20s infinite alternate ease-in-out;
         }
-        /* Orbs đổi sang màu Cyan sáng và Tím rực rỡ */
         .orb-1 { width: 70vw; height: 70vw; background: #0284c7; top: -30vh; left: -10vw; animation-delay: 0s; }
         .orb-2 { width: 60vw; height: 60vw; background: #7c3aed; bottom: -20vh; right: -10vw; animation-delay: -5s; }
 
@@ -102,7 +100,6 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
         }
 
-        /* Nút bấm câu hỏi */
         .glass-button {
             background: linear-gradient(135deg, #0ea5e9, #2563eb);
             border: 2px solid #7dd3fc;
@@ -128,7 +125,7 @@
             cursor: default;
         }
 
-        /* --- FLIP CELLS (DỄ ĐẾM, ĐẬM ĐÀ, NỊNH MẮT) --- */
+        /* --- FLIP CELLS --- */
         .perspective { perspective: 1200px; }
         .flip-inner {
             position: relative;
@@ -146,7 +143,6 @@
             border-radius: 0.5rem; 
         }
         
-        /* Ô trống: Viền trắng nét căng, kính mờ sáng */
         .flip-front {
             background: rgba(255, 255, 255, 0.2); 
             border: 3px solid rgba(255, 255, 255, 0.7); 
@@ -174,7 +170,6 @@
             box-shadow: 0 0 25px rgba(250, 204, 21, 0.6);
         }
 
-        /* Ô đã lật: Nền trắng tinh khôi, chữ Xanh biển đậm */
         .flip-back {
             transform: rotateY(180deg);
             background: #ffffff; 
@@ -183,7 +178,6 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* Ô cột dọc: Nền vàng rực, chữ đỏ thẫm */
         .flip-back.keyword-col {
             background: #facc15; 
             color: #7f1d1d; 
@@ -199,7 +193,6 @@
             z-index: 5;
         }
 
-        /* --- ANIMATIONS --- */
         .morph-anim { animation: textMorphAnim 0.5s ease forwards; }
         .pop-anim { animation: popAnim 0.3s ease forwards; }
 
@@ -237,6 +230,15 @@
         }
         #question-modal.active .modal-content {
             transform: scale(1);
+        }
+
+        /* Hiệu ứng Fade-in cho Gợi ý */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hint-animate {
+            animation: fadeInDown 0.4s var(--apple-spring) forwards;
         }
 
         /* --- DECODING BOXES --- */
@@ -311,7 +313,7 @@
         </div>
 
         <header class="w-full text-center py-[4vh] relative z-10 pointer-events-none">
-            <h1 class="text-[clamp(2.5rem,6vh,4.5rem)] font-black tracking-[0.15em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-white to-emerald-200 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] uppercase">
+            <h1 class="text-[clamp(2.5rem,6vh,4.5rem)] font-black tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-white to-emerald-200 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)] uppercase">
                 Trò Chơi Ô Chữ
             </h1>
         </header>
@@ -323,9 +325,9 @@
         </main>
 
         <div id="question-modal" class="absolute inset-0 z-50 flex flex-col items-center justify-center p-[4vh]">
-            <div class="modal-content rounded-[2rem] p-[5vh] w-full max-w-[140vh] flex flex-col items-center text-center">
+            <div class="modal-content rounded-[2rem] p-[5vh] w-full max-w-[140vh] flex flex-col items-center text-center relative overflow-hidden">
                 
-                <div class="mb-[3vh] flex items-center justify-center gap-4 w-full opacity-90">
+                <div class="mb-[2vh] flex items-center justify-center gap-4 w-full opacity-90">
                     <span class="text-[clamp(1rem,2.5vh,1.5rem)] font-bold tracking-[0.15em] text-cyan-300 uppercase drop-shadow-md" id="q-title">Hàng ngang số X</span>
                     <span class="w-1.5 h-1.5 rounded-full bg-white/50"></span>
                     <span class="text-[clamp(1rem,2vh,1.25rem)] font-bold tracking-wider bg-white/20 border border-white/30 px-4 py-1.5 rounded-lg text-white shadow-inner" id="q-length">X CHỮ CÁI</span>
@@ -333,15 +335,27 @@
                     <span class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-mono timer-mini text-emerald-300 font-black drop-shadow-md" id="timer">15s</span>
                 </div>
                 
-                <p class="text-[clamp(2.2rem,5.5vh,4rem)] font-black leading-snug text-white my-[3vh] w-full drop-shadow-lg" id="q-text">
-                    Nội dung câu hỏi sẽ hiển thị ở đây...
+                <p class="text-[clamp(2.2rem,5.5vh,4rem)] font-black leading-snug text-white my-[2vh] w-full drop-shadow-lg" id="q-text">
+                    Nội dung câu hỏi...
                 </p>
 
-                <div id="attempts-container" class="mb-[2vh] text-[clamp(1.2rem,2.5vh,1.8rem)] font-bold text-rose-300 hidden transition-opacity">
-                    SỐ LẦN ĐOÁN CÒN LẠI: <span id="attempts-left" class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-black text-white bg-rose-600 px-4 py-1 rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.8)] border border-rose-400">2</span>
+                <!-- === KHUNG GỢI Ý (Sẽ hiện ra khi trả lời sai lần 1) === -->
+                <div id="hint-container" class="hidden flex-col items-center justify-center w-full max-w-[90vh] mb-[2vh]">
+                    <div class="flex items-center gap-2 mb-[1.5vh] opacity-90">
+                        <span class="text-amber-400 text-[clamp(1.5rem,3vh,2rem)]">💡</span>
+                        <span class="text-amber-400 font-black text-[clamp(1.2rem,2.5vh,1.8rem)] uppercase tracking-[0.2em] drop-shadow-md">Gợi Ý Hình Ảnh / Câu Hỏi Phụ</span>
+                    </div>
+                    <!-- Ảnh gợi ý -->
+                    <img id="hint-image" src="" alt="Gợi ý" class="hidden max-h-[22vh] object-contain rounded-xl border-2 border-white/20 shadow-[0_5px_20px_rgba(0,0,0,0.5)]">
+                    <!-- Văn bản gợi ý -->
+                    <p id="hint-text" class="hidden text-[clamp(1.8rem,4vh,3rem)] text-cyan-100 font-semibold italic drop-shadow-lg text-center leading-snug bg-white/10 px-8 py-3 rounded-2xl border border-white/20"></p>
                 </div>
 
-                <div id="type-area" class="mt-[2vh] mb-[2vh]">
+                <div id="attempts-container" class="mb-[2vh] text-[clamp(1.2rem,2.5vh,1.8rem)] font-bold text-rose-300 hidden transition-opacity">
+                    CƠ HỘI ĐOÁN CÒN LẠI: <span id="attempts-left" class="text-[clamp(1.5rem,3.5vh,2.5rem)] font-black text-white bg-rose-600 px-4 py-1 rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.8)] border border-rose-400">2</span>
+                </div>
+
+                <div id="type-area" class="mt-[1vh] mb-[1vh]">
                     <div id="input-boxes" class="flex gap-[1vh] flex-wrap justify-center">
                         <!-- Boxes render here -->
                     </div>
@@ -356,11 +370,9 @@
     </div>
 
     <script>
-        // === HỆ THỐNG ÂM THANH (CẬP NHẬT GẮN FILE MP3 CỦA NGƯỜI DÙNG) ===
         const sound = {
             ctx: null,
             decodeTimer: null,
-            // Load các tệp MP3 do giáo viên cung cấp
             sfx: {
                 correct: new Audio('correct.mp3'),
                 wrong: new Audio('wrong-answer-sound-effect.mp3'),
@@ -374,7 +386,6 @@
                 }
                 if (this.ctx.state === 'suspended') this.ctx.resume();
             },
-            // Giữ lại âm thanh điện tử cho các hiệu ứng giao diện (tick, mở bảng, decode)
             playTone(freq, type = 'sine', duration = 0.1, vol = 0.8, slideFreq = null) {
                 if (!this.ctx) return;
                 const osc = this.ctx.createOscillator();
@@ -403,7 +414,6 @@
                 let promise = this.sfx.wrong.play();
                 if (promise !== undefined) {
                     promise.catch(e => {
-                        // Kế hoạch dự phòng: Nếu không tải MP3 lên hoặc lỗi, phát âm thanh điện tử
                         this.playTone(150, 'sawtooth', 0.3, 1.0); 
                         setTimeout(() => this.playTone(130, 'sawtooth', 0.4, 1.0), 150);
                     });
@@ -415,7 +425,6 @@
                 let promise = this.sfx.correct.play();
                 if (promise !== undefined) {
                     promise.catch(e => {
-                        // Kế hoạch dự phòng
                         const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
                         notes.forEach((freq, i) => {
                             setTimeout(() => {
@@ -432,7 +441,6 @@
                 let promise = this.sfx.ding.play();
                 if (promise !== undefined) {
                     promise.catch(e => {
-                        // Kế hoạch dự phòng
                         [261.63, 311.13, 392.00].forEach(freq => this.playTone(freq, 'square', 1.0, 0.5)); 
                         this.playTone(130.81, 'sawtooth', 1.5, 1.0); 
                         setTimeout(() => {
@@ -443,12 +451,10 @@
             },
 
             playGrandWin() {
-                // Chỉ phát một tiếng ding duy nhất khi hoàn thành toàn bộ game thay vì đoạn nhạc dài
                 this.sfx.ding.currentTime = 0;
                 let promise = this.sfx.ding.play();
                 if (promise !== undefined) {
                     promise.catch(e => {
-                        // Kế hoạch dự phòng: 1 tiếng ding điện tử đơn giản, thanh tao
                         this.playTone(1046.50, 'sine', 0.5, 0.6); 
                     });
                 }
@@ -469,15 +475,17 @@
         document.body.addEventListener('click', () => sound.init(), { once: true });
         document.body.addEventListener('keydown', () => sound.init(), { once: true });
 
+        // --- CẤU TRÚC DỮ LIỆU (TÍCH HỢP HỆ THỐNG GỢI Ý / HINT) ---
         const puzzleData = [
-            { id: 1, word: "HẠTNHÂN", clue: "Trung tâm của nguyên tử, chứa proton và neutron", keyIndex: 3 },
-            { id: 2, word: "VÀNG", clue: "Kim loại Rutherford dùng trong thí nghiệm bắn phá", keyIndex: 3 },
-            { id: 3, word: "AMU", clue: "Đơn vị khối lượng nguyên tử (viết tắt)", keyIndex: 2 },
-            { id: 4, word: "HYLẠP", clue: "Nơi Democritus đề xuất khái niệm 'atomos'", keyIndex: 1 },
-            { id: 5, word: "ĐIỆNTÍCH", clue: "Thuộc tính của proton (+) và electron (-)", keyIndex: 2 },
-            { id: 6, word: "THOMSON", clue: "Nhà bác học người Anh phát hiện ra electron (1897)", keyIndex: 6 },
-            { id: 7, word: "PROTON", clue: "Hạt mang điện dương trong hạt nhân", keyIndex: 3 },
-            { id: 8, word: "KÍCHTHƯỚC", clue: "Đặc điểm của nguyên tử, đo bằng pm hoặc Å", keyIndex: 6 } 
+            { id: 1, word: "HẠTNHÂN", clue: "Trung tâm của nguyên tử, chứa proton và neutron", keyIndex: 3, hintType: "image", hintContent: "1.png" },
+            { id: 2, word: "VÀNG", clue: "Kim loại Rutherford dùng trong thí nghiệm bắn phá", keyIndex: 3, hintType: "image", hintContent: "2.jpg" },
+            { id: 3, word: "AMU", clue: "Đơn vị khối lượng nguyên tử (viết tắt)", keyIndex: 2, hintType: "text", hintContent: "Giá trị của nó bằng 1/12 khối lượng của một nguyên tử đồng vị Carbon-12." },
+            { id: 4, word: "HYLẠP", clue: "Nơi Democritus đề xuất khái niệm 'atomos'", keyIndex: 1, hintType: "image", hintContent: "4.jpg" },
+            // Đã đổi câu hỏi theo yêu cầu thầy/cô
+            { id: 5, word: "ĐIỆNTÍCH", clue: "Đặc điểm chung của proton (+) và electron (-) là...", keyIndex: 2, hintType: "text", hintContent: "Đại lượng này luôn được bảo toàn trong một hệ cô lập và có đơn vị đo trong hệ SI là Coulomb (C)." },
+            { id: 6, word: "THOMSON", clue: "Nhà bác học người Anh phát hiện ra electron (1897)", keyIndex: 6, hintType: "image", hintContent: "6.jpg" },
+            { id: 7, word: "PROTON", clue: "Hạt mang điện dương trong hạt nhân", keyIndex: 3, hintType: "image", hintContent: "7.jpg" }, // Chân dung Ernest Rutherford
+            { id: 8, word: "KÍCHTHƯỚC", clue: "Đặc điểm của nguyên tử, đo bằng pm hoặc Å", keyIndex: 6, hintType: "image", hintContent: "8.png" } 
         ];
 
         const KEYWORD_COLUMN_INDEX = 6; 
@@ -582,11 +590,17 @@
             attemptsLeft = 2;
             isDecoding = false;
 
+            // Reset trạng thái báo lỗi và bộ đếm
             const typeArea = document.getElementById('type-area');
             if(typeArea) typeArea.classList.remove('shake-error');
-
             const attemptsContainer = document.getElementById('attempts-container');
             if(attemptsContainer) attemptsContainer.classList.add('hidden'); 
+
+            // Ẩn Hint Container mỗi khi mở câu hỏi mới
+            const hintContainer = document.getElementById('hint-container');
+            hintContainer.classList.add('hidden');
+            hintContainer.classList.remove('hint-animate');
+            hintContainer.classList.remove('flex'); // Tránh flex làm lộ padding
 
             const modal = document.getElementById('question-modal');
             modal.classList.add('active');
@@ -627,6 +641,31 @@
                 closePanel();
             }
         });
+
+        // --- HIỂN THỊ GỢI Ý ---
+        function showHint() {
+            const rowData = puzzleData.find(r => r.id === activeRowId);
+            if (!rowData) return;
+
+            const hintContainer = document.getElementById('hint-container');
+            const hintImage = document.getElementById('hint-image');
+            const hintText = document.getElementById('hint-text');
+
+            // Xóa class hidden, thêm class flex và class hiệu ứng fade in
+            hintContainer.classList.remove('hidden');
+            hintContainer.classList.add('flex', 'hint-animate');
+
+            // Xử lý dữ liệu Hint
+            if (rowData.hintType === 'image') {
+                hintImage.src = rowData.hintContent;
+                hintImage.classList.remove('hidden');
+                hintText.classList.add('hidden');
+            } else if (rowData.hintType === 'text') {
+                hintText.innerText = rowData.hintContent;
+                hintText.classList.remove('hidden');
+                hintImage.classList.add('hidden');
+            }
+        }
 
         // --- KĨ XẢO DECODING ---
         function runDecodingAnimation() {
@@ -685,7 +724,7 @@
             }
         }
 
-        // --- XỬ LÝ SAI ---
+        // --- XỬ LÝ SAI & KÍCH HOẠT GỢI Ý ---
         function submitWrong() {
             attemptsLeft--;
             sound.playWrong();
@@ -701,7 +740,13 @@
             
             setTimeout(() => {
                 typeArea.classList.remove('shake-error'); 
-                if (attemptsLeft <= 0) closePanel(); 
+                
+                if (attemptsLeft <= 0) {
+                    closePanel(); 
+                } else {
+                    // CÒN 1 LƯỢT: Bật hệ thống Gợi Ý (Hint System)
+                    showHint();
+                }
             }, 600); 
         }
 
